@@ -8,110 +8,126 @@
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', Arial, sans-serif; background: #000; color: #fff; text-align: center; min-height: 100vh; overflow: hidden; }
 
-        /* KHUNG NHẮC NHỞ XOAY NGANG MÀN HÌNH (Hiện khi điện thoại đang để dọc) */
+        /* MÀN HÌNH NHẮC XOAY NGANG (Y HỆT MẪU TIKTOK) */
         #rotate-notice {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(5, 5, 10, 0.95); z-index: 999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            padding: 20px; box-sizing: border-box;
+            background: #000; z-index: 9999; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; color: #fff;
         }
         .phone-icon {
-            font-size: 50px; margin-bottom: 15px;
-            animation: rotateAnim 2s infinite ease-in-out;
+            width: 60px; height: 100px; border: 3px solid #fff; border-radius: 12px;
+            margin-bottom: 20px; animation: rotateAnim 2s infinite ease-in-out; position: relative;
+        }
+        .phone-icon::after {
+            content: ''; position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
+            width: 8px; height: 8px; background: #fff; border-radius: 50%;
         }
         @keyframes rotateAnim {
             0% { transform: rotate(0deg); }
             50% { transform: rotate(-90deg); }
-            100% { transform: rotate(0deg); }
+            100% { transform: rotate(-90deg); }
         }
-        #rotate-notice p { color: #ff758c; font-size: 16px; font-weight: bold; line-height: 1.5; }
+        #rotate-notice p { font-size: 15px; color: #ccc; letter-spacing: 0.5px; }
+
+        /* KHUNG ÉP XOAY TỰ ĐỘNG BẰNG CSS */
+        #app-container {
+            width: 100vw; height: 100vh; position: relative; overflow: hidden;
+            transition: transform 0.3s ease;
+        }
+
+        /* Khi điện thoại đứng nhưng người dùng cầm ngang (Khóa Auto-Rotate) */
+        body.force-landscape #app-container {
+            transform: rotate(90deg);
+            transform-origin: bottom left;
+            position: absolute; top: -100vw; left: 0;
+            width: 100vh; height: 100vw;
+        }
 
         /* KHUNG MẬT KHẨU */
         .lock-card { 
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%);
-            width: 85%; max-width: 380px; padding: 30px 20px; border-radius: 20px; 
-            background: rgba(20, 20, 30, 0.85); backdrop-filter: blur(15px); 
-            border: 1px solid rgba(255, 117, 140, 0.4); box-shadow: 0 0 30px rgba(255, 117, 140, 0.25); 
-            z-index: 100;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 85%; max-width: 360px; padding: 25px 20px; border-radius: 20px; 
+            background: rgba(20, 20, 30, 0.95); backdrop-filter: blur(15px); 
+            border: 1px solid rgba(255, 117, 140, 0.5); box-shadow: 0 0 30px rgba(255, 117, 140, 0.3); 
+            z-index: 1000;
         }
-        .lock-card h3 { color: #ff758c; margin-bottom: 12px; font-size: 22px; }
-        .lock-card p { color: #ccc; font-size: 13px; margin-bottom: 18px; }
-        .lock-card input { width: 90%; padding: 12px; border: 2px solid #ff758c; border-radius: 10px; font-size: 16px; text-align: center; outline: none; margin-bottom: 15px; background: #111; color: #fff; }
-        .lock-card button { width: 90%; padding: 12px; background: linear-gradient(135deg, #ff758c, #ff7eb3); color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4); }
+        .lock-card h3 { color: #ff758c; margin-bottom: 10px; font-size: 20px; }
+        .lock-card p { color: #ccc; font-size: 13px; margin-bottom: 15px; }
+        .lock-card input { 
+            width: 100%; padding: 12px; border: 2px solid #ff758c; border-radius: 10px; 
+            font-size: 16px; text-align: center; outline: none; margin-bottom: 15px; 
+            background: #111; color: #fff;
+        }
+        .lock-card button { 
+            width: 100%; padding: 12px; background: linear-gradient(135deg, #ff758c, #ff7eb3); 
+            color: white; border: none; border-radius: 10px; font-size: 16px; font-weight: bold; 
+            cursor: pointer; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4); 
+        }
         #error-msg { color: #ff4d4d; font-size: 13px; margin-top: 10px; display: none; }
 
-        /* CANVAS HIỆU ỨNG */
-        #main-canvas { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: none; }
+        /* CANVAS MATRIX */
+        #main-canvas { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; display: none; }
 
         /* THƯ VÀ VIDEO CUỐI CÙNG */
         #final-content {
             position: relative; z-index: 10; display: none;
-            max-width: 600px; margin: 20px auto; padding: 25px 20px;
+            max-width: 600px; margin: 20px auto; padding: 20px;
             background: rgba(15, 15, 25, 0.9); backdrop-filter: blur(15px);
             border-radius: 20px; border: 1px solid rgba(255, 117, 140, 0.4);
             box-shadow: 0 8px 32px rgba(255, 117, 140, 0.25); text-align: left;
             max-height: 85vh; overflow-y: auto;
         }
-
-        .letter-text { font-size: 15px; color: #ffe6ea; line-height: 1.7; text-align: justify; margin-bottom: 20px; }
-
-        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 2px solid #ff758c; margin-top: 15px; }
+        .letter-text { font-size: 14px; color: #ffe6ea; line-height: 1.6; text-align: justify; margin-bottom: 15px; }
+        .video-wrapper { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; border-radius: 12px; border: 2px solid #ff758c; margin-top: 10px; }
         .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
-
         .btn-video {
             display: block; text-align: center; background: linear-gradient(135deg, #ff758c, #ff7eb3);
-            color: white; text-decoration: none; padding: 14px; border-radius: 30px;
-            font-size: 15px; font-weight: bold; margin-top: 15px; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
+            color: white; text-decoration: none; padding: 12px; border-radius: 30px;
+            font-size: 14px; font-weight: bold; margin-top: 12px; box-shadow: 0 4px 15px rgba(255, 117, 140, 0.4);
         }
     </style>
 </head>
 <body>
 
+    <!-- MÀN HÌNH MẶC ĐỊNH YÊU CẦU XOAY MÁY -->
     <div id="rotate-notice">
-        <div class="phone-icon">📱</div>
-        <p>Để trải nghiệm hiệu ứng đẹp nhất,<br>bạn hãy xoay ngang màn hình điện thoại nhé! ❤️</p>
+        <div class="phone-icon"></div>
+        <p>Vui lòng xoay ngang thiết bị của bạn</p>
     </div>
 
-    <div class="lock-card" id="lock-box">
-        <h3>🔒 Hộp Quà Bị Khóa</h3>
-        <p>Vui lòng nhập mật khẩu để mở khóa!</p>
-        <input type="password" id="pass" placeholder="Nhập mật khẩu..." onkeypress="if(event.key==='Enter') unlock()">
-        <button onclick="unlock()">MỞ KHÓA</button>
-        <p id="error-msg">⚠️ Mật khẩu chưa chính xác rồi cậu ơi!</p>
-    </div>
+    <!-- KHUNG CHỨA TOÀN BỘ NỘI DUNG WEB -->
+    <div id="app-container">
 
-    <canvas id="main-canvas"></canvas>
-
-    <div id="final-content">
-        <div class="letter-text">
-            Tada ! Bất ngờ chưa ? Món quà này Linh tự tay thiết kế mọi thứ để dành tặng Mai Anh , hi vọng Mai Anh sẽ thích nó, sau khi xem xong đừng mít ướt nhé .À quên khi bắt đầu mở thì dung lượng vừa phải thôi nhé ,không là hết hồn đó, có đoạn của Linh nói hơi bé nếu mở maximum mà vẫn bé thì có thể xem vietsub nhé haha. Cảm ơn Mai Anh vì tất cả . Snvv nhé Anhiu ! 🥰🥳
+        <!-- KHUNG MẬT KHẨU -->
+        <div class="lock-card" id="lock-box">
+            <h3>🔒 Món Quà Bị Khóa </h3>
+            <p>Nhập mật khẩu để mở quà nhé! ❤️</p>
+            <input type="password" id="pass" placeholder="Nhập mật khẩu..." onkeypress="if(event.key==='Enter') unlock()">
+            <button onclick="unlock()">MỞ KHÓA</button>
+            <p id="error-msg">⚠️ Mật khẩu chưa chính xác rồi cậu ơi!</p>
         </div>
 
-        <div class="video-wrapper">
-            <iframe src="https://drive.google.com/file/d/1F3S4JQdHc-Jxp0POF0_AAHsQux1G2pxp/preview"></iframe>
+        <!-- CANVAS MATRIX & CHỮ -->
+        <canvas id="main-canvas"></canvas>
+
+        <!-- KHUNG THƯ & VIDEO -->
+        <div id="final-content">
+            <div class="letter-text">
+                Tada ! Bất ngờ chưa ? Món quà này Linh tự tay thiết kế mọi thứ để dành tặng Mai Anh , hi vọng Mai Anh sẽ thích nó, sau khi xem xong đừng mít ướt nhé .À quên khi bắt đầu mở thì dung lượng vừa phải thôi nhé ,không là hết hồn đó, có đoạn của Linh nói hơi bé nếu mở maximum mà vẫn bé thì có thể xem vietsub nhé haha. Cảm ơn Mai Anh vì tất me . Snvv nhé Anhiu ! 🥰🥳
+            </div>
+
+            <div class="video-wrapper">
+                <iframe src="https://drive.google.com/file/d/1F3S4JQdHc-Jxp0POF0_AAHsQux1G2pxp/preview"></iframe>
+            </div>
+
+            <a href="https://drive.google.com/file/d/1F3S4JQdHc-Jxp0POF0_AAHsQux1G2pxp/preview" target="_blank" class="btn-video">
+                🎬 NHẤP VÀO ĐÂY XEM CÓ GÌ ?
+            </a>
         </div>
 
-        <a href="https://drive.google.com/file/d/1F3S4JQdHc-Jxp0POF0_AAHsQux1G2pxp/previewview" target="_blank" class="btn-video">
-            🎬 NHẤP VÀO ĐÂY ĐỂ XEM CÓ GÌ ?
-        </a>
     </div>
 
     <script>
-        // Tự động kiểm tra hướng màn hình
-        function checkOrientation() {
-            const notice = document.getElementById('rotate-notice');
-            if (window.innerHeight > window.innerWidth) {
-                // Đang ở chiều dọc
-                notice.style.display = 'flex';
-            } else {
-                // Đang ở chiều ngang
-                notice.style.display = 'none';
-            }
-        }
-
-        window.addEventListener('resize', checkOrientation);
-        window.addEventListener('load', checkOrientation);
-
         const texts = [
             "3",
             "2",
@@ -121,6 +137,42 @@
             "Mọi điều đều\nthuận lợi 🥳",
             "Luôn được\nyêu thương nhé 🥰"
         ];
+
+        // TỰ ĐỘNG NHẬN DIỆN HƯỚNG MÀN HÌNH & GIA TỐC
+        function checkOrientation() {
+            const isLandscapeNative = window.innerWidth > window.innerHeight;
+            const rotateNotice = document.getElementById('rotate-notice');
+
+            if (isLandscapeNative) {
+                // Người dùng bật Auto-Rotate và xoay ngang
+                document.body.classList.remove('force-landscape');
+                rotateNotice.style.display = 'none';
+            } else {
+                // Đang cầm đứng
+                rotateNotice.style.display = 'flex';
+            }
+        }
+
+        // Lắng nghe sự kiện cảm biến độ nghiêng thiết bị (Dành cho điện thoại bị khóa xoay)
+        if (window.DeviceOrientationEvent) {
+            window.addEventListener('deviceorientation', function(event) {
+                const alpha = Math.abs(event.gamma); // Góc nghiêng ngang
+                const rotateNotice = document.getElementById('rotate-notice');
+                
+                // Nếu nghiêng máy hơn 45 độ
+                if (alpha > 45 && window.innerHeight > window.innerWidth) {
+                    document.body.classList.add('force-landscape');
+                    rotateNotice.style.display = 'none';
+                } else if (window.innerHeight < window.innerWidth) {
+                    document.body.classList.remove('force-landscape');
+                    rotateNotice.style.display = 'none';
+                }
+            });
+        }
+
+        window.addEventListener('resize', checkOrientation);
+        window.addEventListener('orientationchange', checkOrientation);
+        checkOrientation();
 
         function unlock() {
             const userInput = document.getElementById("pass").value;
@@ -138,16 +190,17 @@
             canvas.style.display = 'block';
             const ctx = canvas.getContext('2d');
             
-            let width = canvas.width = window.innerWidth;
-            let height = canvas.height = window.innerHeight;
+            const container = document.getElementById('app-container');
+            let width = canvas.width = container.clientWidth;
+            let height = canvas.height = container.clientHeight;
 
             window.addEventListener('resize', () => {
-                width = canvas.width = window.innerWidth;
-                height = canvas.height = window.innerHeight;
+                width = canvas.width = container.clientWidth;
+                height = canvas.height = container.clientHeight;
             });
 
-            // 1. Matrix Rain Background
-            const chars = '0123456789ABCDEFMAIANHLINH1208❤️✨';
+            // Matrix Rain
+            const chars = '0123456789ABCDEFMAIANHLINH17082005❤️✨';
             const fontSize = 14;
             const columns = Math.floor(width / fontSize);
             const drops = Array(columns).fill(1);
@@ -166,7 +219,7 @@
                 }
             }
 
-            // 2. Particle Text System (Tính toán kích thước linh hoạt theo chiều rộng màn hình)
+            // Hạt chữ / Trái tim
             let particles = [];
             const numParticles = 1200;
 
@@ -187,17 +240,13 @@
                 const offCtx = offCanvas.getContext('2d');
 
                 offCtx.fillStyle = '#ffffff';
-                
-                // Tự động điều chỉnh kích thước chữ linh hoạt theo màn hình
-                let fontSize = Math.min(width * 0.08, 36); 
-                if (fontSize < 20) fontSize = 20;
-
-                offCtx.font = 'bold ' + fontSize + 'px Arial';
+                let dynamicSize = Math.min(height * 0.18, 42);
+                offCtx.font = 'bold ' + dynamicSize + 'px Arial';
                 offCtx.textAlign = 'center';
                 offCtx.textBaseline = 'middle';
 
                 const lines = text.split('\n');
-                const lineHeight = fontSize * 1.3;
+                const lineHeight = dynamicSize * 1.3;
                 const startY = height / 2 - ((lines.length - 1) * lineHeight) / 2;
 
                 lines.forEach((line, index) => {
@@ -219,7 +268,6 @@
                 return points;
             }
 
-            // Tự động tính tỷ lệ kích thước Trái tim theo chiều ngang/dọc
             function getHeartPoints() {
                 const points = [];
                 const scale = Math.min(width, height) * 0.022; 
@@ -283,7 +331,7 @@
                         setTimeout(() => {
                             canvas.style.display = 'none';
                             document.getElementById('final-content').style.display = 'block';
-                        }, 4000);
+                        }, 4500);
                     }, 550);
                 }
             }
@@ -310,7 +358,7 @@
                 if (state === "HEART") {
                     ctx.save();
                     ctx.fillStyle = "#ffffff";
-                    ctx.font = (width < 500 ? "13px" : "15px") + " Arial";
+                    ctx.font = "15px Arial";
                     ctx.textAlign = "center";
                     ctx.shadowBlur = 10;
                     ctx.shadowColor = "#ff758c";
